@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <video id="video" width="320" height="240" controls>
+    </video>
+
+    <script src="mpegts.js"></script>
+    <script>
+        const url = new URL(window.location.href);
+        const videoUrl = url.searchParams.get("url");
+
+        const video = document.getElementById("video");
+
+        const player = mpegts.createPlayer({
+            type: 'm2ts',
+            isLive: false,
+            url: videoUrl
+        });
+
+        player.on("loading_complete", () => {
+            const data = player.mediaInfo;
+
+            console.log(data);
+        });
+
+        player.attachMediaElement(video);
+        player.load();
+    </script>
+</body>
+
+</html>

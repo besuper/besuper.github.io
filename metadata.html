@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head></head>
+<body>
+    <script src="mpegts.js"></script>
+    <script>
+        async function getMetadataSegment(segment_url) {
+            return new Promise((resolve, reject) => {
+                const fakeVideoElement = document.createElement("video");
+
+                const player = mpegts.createPlayer({
+                    type: 'm2ts',
+                    isLive: false,
+                    url: segment_url
+                });
+
+                player.on("loading_complete", () => {
+                    const data = player.mediaInfo;
+
+                    const codecs = data.videoCodec + "," + data.audioCodec;
+                    const name = `${data.height}p${data.fps}`;
+                    const frameRate = data.fps;
+                    const resolution = `${data.width}x${data.height}`;
+
+                    resolve({
+                        codecs,
+                        name,
+                        frameRate,
+                        resolution
+                    });
+                });
+
+                player.attachMediaElement(fakeVideoElement);
+                player.load();
+            });
+        }
+    </script>
+    <script>
+        (async () => {
+            const url = new URL(window.location.href);
+            const videoUrl = url.searchParams.get("url");
+
+            document.body.innerHTML = JSON.stringify(await getMetadataSegment(videoUrl));
+        })();
+
+
+    </script>
+</body>
+
+</html>
